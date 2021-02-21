@@ -3,7 +3,7 @@ import logging
 
 import time
 
-import bt_button.src as bt_button
+import bt_button.bt_button as bt_button
 
 loglevels = [logging.CRITICAL, logging.ERROR, logging.WARNING,
              logging.INFO, logging.DEBUG]
