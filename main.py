@@ -3,7 +3,6 @@ import logging
 
 import time
 
-# import bt_button.bt_button as bt_button
 import bt_button
 
 loglevels = [logging.CRITICAL, logging.ERROR, logging.WARNING,
@@ -31,20 +30,24 @@ def main():
     args = parse_args()
     logging.basicConfig(level=loglevels[args.loglevel])
 
-    while True:
-        try:
-            button = bt_button.AbShutter()
-            # button.add_pushed_listener(pushed)
-            button.add_released_listener(released)
-            button.start()
-        except bt_button.DeviceNotFoundError as e:
-            logging.debug(e)
+    ab_shutter = bt_button.AbShutter(MAC_AB)
+    # button.add_pushed_listener(pushed)
+    ab_shutter.add_released_listener(released)
 
-        try:
-            button = bt_button.BTselfie()
-            button.start()
-        except bt_button.DeviceNotFoundError as e:
-            logging.debug(e)
+    bt_selfie = bt_button.BTselfie(MAC_BS)
+
+    while True:
+        if not ab_shutter.is_connected():
+            try:
+                ab_shutter.connect()
+            except bt_button.DeviceNotFoundError as e:
+                logging.debug(e)
+
+        if not bt_selfie.is_connected():
+            try:
+                bt_selfie.connect()
+            except bt_button.DeviceNotFoundError as e:
+                logging.debug(e)
 
         time.sleep(1)
 
