@@ -4,6 +4,7 @@ import logging
 import time
 
 import bt_button
+import bluepy
 
 loglevels = [logging.CRITICAL, logging.ERROR, logging.WARNING,
              logging.INFO, logging.DEBUG]
@@ -31,10 +32,14 @@ def main():
     logging.basicConfig(level=loglevels[args.loglevel])
 
     ab_shutter = bt_button.AbShutter(MAC_AB)
-    # button.add_pushed_listener(pushed)
-    ab_shutter.add_released_listener(released)
+    ab_shutter.attach_pushed_listener(pushed)
+    ab_shutter.attach_released_listener(released)
 
     bt_selfie = bt_button.BTselfie(MAC_BS)
+    bt_selfie.attach_clicked_listener(released)
+
+    smart_palette = bt_button.SmartPalette(MAC_PA)
+    smart_palette.attach_pushed_listener(bt_button.SmartPaletteButton.RED, pushed)
 
     while True:
         if not ab_shutter.is_connected():
@@ -49,11 +54,20 @@ def main():
             except bt_button.DeviceNotFoundError as e:
                 logging.debug(e)
 
+        if not smart_palette.is_connected():
+            try:
+                smart_palette.connect()
+            except bt_button.DeviceNotFoundError as e:
+                logging.debug(e)
+            # except bluepy.btle.BTLEDisconnectError as e:
+            #     logging.debug(e)
+
         time.sleep(1)
 
 
-def pushed(event):
+def pushed(event = None):
     print(event)
+    print("Pushed!")
 
 
 def released(event):
